@@ -1,25 +1,17 @@
-import { pgTable, serial, text, timestamp, integer, jsonb, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
 
 /**
- * Local user row keyed on the Neon Auth `sub` claim. Identity lives in the
- * neon_auth schema; this table owns app-specific user state + foreign keys.
+ * Chat conversations and their messages. In local-first mode every row
+ * belongs to the implicit "owner" (a single human running this on their
+ * machine), so there is no user FK yet. When hosted mode lands we'll add a
+ * users table back and a user_id column on conversations.
  */
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  providerUserId: text("provider_user_id").notNull().unique(),
-  email: text("email").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
-
-/** Chat conversations the user has had with the AI. */
 export const conversations = pgTable("conversations", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   title: text("title"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
-/** Individual messages inside a conversation. */
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
   conversationId: integer("conversation_id").notNull().references(() => conversations.id, { onDelete: "cascade" }),

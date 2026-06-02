@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut, useSession } from "@/lib/auth-client";
+import { usePathname } from "next/navigation";
 
 const NAV = [
   { href: "/subscriptions", label: "Subscriptions", icon: SubsIcon },
@@ -11,13 +10,6 @@ const NAV = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { data: session } = useSession();
-
-  async function handleSignOut() {
-    await signOut();
-    router.replace("/");
-  }
 
   return (
     <aside className="w-60 shrink-0 border-r border-line bg-sidebar flex flex-col">
@@ -43,10 +35,7 @@ export function Sidebar() {
         })}
       </nav>
       <div className="px-3 py-3 border-t border-line">
-        <div className="px-2 pb-2 text-xs text-muted truncate">{session?.user?.email ?? ""}</div>
-        <button onClick={handleSignOut} className="btn btn-ghost w-full justify-start text-sm">
-          Sign out
-        </button>
+        <div className="px-2 text-xs text-muted">local-first · no sign-in</div>
       </div>
     </aside>
   );
