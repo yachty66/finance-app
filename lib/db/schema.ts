@@ -52,6 +52,19 @@ export const analyses = pgTable("analyses", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+/**
+ * Cached LLM commentary for the /overview page. Keyed by a SHA-256
+ * fingerprint of the structured overview data we sent to the model — same
+ * fingerprint = same text, no need to regenerate. New month, new pull, or
+ * different attention items change the fingerprint and trigger a refresh.
+ */
+export const overviewCommentaries = pgTable("overview_commentaries", {
+  id: serial("id").primaryKey(),
+  fingerprint: text("fingerprint").notNull().unique(),
+  text: text("text").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 /** Chat conversations (already existed). */
 export const conversations = pgTable("conversations", {
   id: serial("id").primaryKey(),
