@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { BankPicker } from "@/components/BankPicker";
+import { SubscriptionCalendar } from "@/components/SubscriptionCalendar";
 
 type Account = { id: number; iban: string | null; name: string | null; last_pull_at: string | null };
 type Subscription = {
@@ -88,7 +89,7 @@ export default function SubscriptionsPage() {
   const hasAccounts = accounts.length > 0;
 
   return (
-    <div className="p-8 max-w-6xl w-full">
+    <div className="p-8 w-full">
       {notice && (
         <div className="mb-4 px-4 py-3 rounded-lg bg-card border border-line text-foreground text-sm">{notice}</div>
       )}
@@ -150,8 +151,8 @@ export default function SubscriptionsPage() {
               <span className="block mt-2 text-sm text-muted">First run can take up to ~5 minutes.</span>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-[1.5fr_1fr] gap-6">
-              <div className="card p-6">
+            <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-6 w-full">
+              <div className="card p-6 min-w-0 overflow-hidden">
                 <h2 className="text-lg font-semibold mb-3">Subscriptions</h2>
                 <table className="w-full text-sm border-separate border-spacing-0">
                   <thead>
@@ -210,18 +211,7 @@ export default function SubscriptionsPage() {
                 )}
               </div>
 
-              <aside className="card p-6">
-                <h2 className="text-lg font-semibold mb-3">What stands out</h2>
-                {data?.brief ? (
-                  <div className="prose text-foreground/90">
-                    {data.brief.split("\n\n").map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted text-sm">No brief generated yet.</p>
-                )}
-              </aside>
+              <SubscriptionCalendar />
             </div>
           )}
         </>
