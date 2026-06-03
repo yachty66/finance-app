@@ -134,8 +134,16 @@ export default function SubscriptionsPage() {
     }
   }
 
-  const accounts = data?.accounts ?? [];
-  const a = data?.analysis;
+  // While the initial /api/analysis fetch is in flight, render a quiet
+  // placeholder rather than the "Connect a bank" empty state — otherwise a
+  // hard reload briefly flashes the onboarding screen even when a bank is
+  // already connected.
+  if (data === null) {
+    return <div className="p-8 text-muted text-sm">Loading…</div>;
+  }
+
+  const accounts = data.accounts ?? [];
+  const a = data.analysis;
   const hasAccounts = accounts.length > 0;
 
   return (
