@@ -1,8 +1,11 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { DEFAULT_MODEL, MODEL_OPTIONS } from "@/lib/models";
 
 type Msg = { role: "user" | "assistant"; content: string };
+
+const MODEL_STORAGE_KEY = "finance-app:chat-model";
 
 // The system prompt — including all the user's transactions, subscriptions,
 // and account context — is built and injected by the server in /api/chat.
@@ -12,7 +15,20 @@ export function ChatUI() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [model, setModel] = useState<string>(DEFAULT_MODEL);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Restore last-picked model on mount. Done in an effect (not initial state)
+  // so server and client first render agree.
+  useEffect(() => {
+    const saved = typeof window !== "undefined" ? window.localStorage.getItem(MODEL_STORAGE_KEY) : null;
+    if (saved) setModel(saved);
+  }, []);
+
+  function changeModel(next: string) {
+    setModel(next);
+    if (typeof window !== "undefined") window.localStorage.setItem(MODEL_STORAGE_KEY, next);
+  }
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -37,6 +53,7 @@ export function ChatUI() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: next,
+          model,
         }),
       });
 
@@ -91,11 +108,30 @@ export function ChatUI() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="px-8 py-5 border-b border-line">
-        <h1 className="text-lg font-semibold tracking-tight">AI Chat</h1>
-        <p className="text-xs text-muted mt-1">
-          OpenRouter · {process.env.NEXT_PUBLIC_MODEL ?? "anthropic/claude-sonnet-4.5"}
-        </p>
+      <header className="px-8 py-5 border-b border-line flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight">AI Chat</h1>
+          <p className="text-xs text-muted mt-1">OpenRouter · {model}</p>
+        </div>
+        <label className="flex items-center gap-2 text-xs text-muted">
+          <span className="uppercase tracking-wide">Model</span>
+          <select
+            value={MODEL_OPTIONS.some((m) => m.slug === model) ? model : ""}
+            onChange={(e) => changeModel(e.target.value)}
+            disabled={streaming}
+            className="bg-card border border-line rounded px-2 py-1 text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-foreground/20 disabled:opacity-60"
+          >
+            {!MODEL_OPTIONS.some((m) => m.slug === model) && (
+              <option value="">{model} (custom)</option>
+            )}
+            {MODEL_OPTIONS.map((m) => (
+              <option key={m.slug} value={m.slug}>
+                {m.label}
+                {m.hint ? ` — ${m.hint}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
       </header>
 
       <div className="flex-1 overflow-y-auto px-8 py-6">

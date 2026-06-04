@@ -235,8 +235,8 @@ export default function SubscriptionsPage() {
               <span className="block mt-2 text-sm text-muted">First run can take up to ~5 minutes.</span>
             </div>
           ) : (
-            <div className="grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-6 w-full">
-              <div className="card p-6 min-w-0 overflow-hidden">
+            <div className="grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-6 w-full">
+              <div className="card p-6 min-w-0">
                 <h2 className="text-lg font-semibold mb-3">All contracts</h2>
                 <table className="w-full text-sm border-separate border-spacing-0">
                   <thead>
@@ -298,20 +298,34 @@ export default function SubscriptionsPage() {
                               <td className="py-3 pr-6 border-t border-line text-right tabular-nums font-medium whitespace-nowrap">
                                 {eur(s.monthly_amount_eur)}
                               </td>
-                              <td className="py-3 pr-6 border-t border-line whitespace-nowrap">
-                                <span className="pill text-[10px]">{s.category ?? "other"}</span>
+                              <td className="py-3 pr-4 border-t border-line align-middle">
+                                <span className="pill text-[10px] inline-block max-w-full">
+                                  {(s.category ?? "other").replace(/-/g, " ")}
+                                </span>
                               </td>
-                              <td className="py-3 border-t border-line text-right whitespace-nowrap">
-                                <div className="inline-flex items-center gap-1">
+                              <td className="py-3 pr-4 border-t border-line text-right whitespace-nowrap">
+                                <div className="inline-flex items-center gap-1.5">
                                   {!isObligation && (
                                     <button
                                       data-row-action
                                       onClick={(e) => { e.stopPropagation(); dismissSub(s as Subscription); }}
                                       title={s.manual ? "Remove" : "Dismiss"}
                                       aria-label={s.manual ? "Remove subscription" : "Dismiss subscription"}
-                                      className="text-muted opacity-0 group-hover:opacity-100 hover:text-foreground transition px-1.5 py-1 text-sm"
+                                      className="text-foreground/70 hover:text-foreground hover:bg-foreground/10 rounded-md transition w-7 h-7 inline-flex items-center justify-center"
                                     >
-                                      ✕
+                                      <svg
+                                        width="15"
+                                        height="15"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2.5"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        aria-hidden
+                                      >
+                                        <path d="M6 6l12 12M6 18L18 6" />
+                                      </svg>
                                     </button>
                                   )}
                                   {hasDetail && (

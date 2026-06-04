@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const NAV: { href: string; label: string; icon: () => React.ReactNode }[] = [
+const NAV: { href: string; label: string; icon: () => React.ReactNode; soon?: boolean }[] = [
   { href: "/subscriptions", label: "Contracts", icon: SubsIcon },
-  { href: "/analysis", label: "Analysis", icon: AnalysisIcon },
   { href: "/transactions", label: "Transactions", icon: TxIcon },
   { href: "/chat", label: "AI Chat", icon: ChatIcon },
+  { href: "/analysis", label: "Analysis", icon: AnalysisIcon, soon: true },
 ];
 
 export function Sidebar() {
@@ -16,12 +16,12 @@ export function Sidebar() {
   return (
     <aside className="w-60 shrink-0 border-r border-line bg-sidebar flex flex-col sticky top-0 h-screen self-start">
       <div className="px-5 py-5 border-b border-line">
-        <Link href="/analysis" className="font-semibold tracking-tight text-foreground">
+        <Link href="/subscriptions" className="font-semibold tracking-tight text-foreground">
           finance-app
         </Link>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {NAV.map(({ href, label, icon: Icon }) => {
+        {NAV.map(({ href, label, icon: Icon, soon }) => {
           const active = pathname === href || pathname?.startsWith(href + "/");
           return (
             <Link
@@ -31,7 +31,13 @@ export function Sidebar() {
                 active ? "bg-card text-foreground" : "text-muted hover:text-foreground hover:bg-card/60"
               }`}
             >
-              <Icon /> {label}
+              <Icon />
+              <span className="flex-1">{label}</span>
+              {soon && (
+                <span className="text-[9px] uppercase tracking-wider text-muted/70 border border-line rounded px-1.5 py-0.5">
+                  soon
+                </span>
+              )}
             </Link>
           );
         })}
